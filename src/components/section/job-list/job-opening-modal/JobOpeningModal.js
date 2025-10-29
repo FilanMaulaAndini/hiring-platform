@@ -21,6 +21,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
   const initial = {
     jobName: "",
     jobType: "",
+    jobLocation: "",
     jobDescription: "",
     numberOfCandidates: "",
     minSalary: "",
@@ -34,14 +35,15 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
   const refs = {
     jobName: useRef(null),
     jobType: useRef(null),
+    jobLocation: useRef(null),
     jobDescription: useRef(null),
     numberOfCandidates: useRef(null),
   };
-
   const validate = (values) => {
     const e = {};
     if (!values.jobName.trim()) e.jobName = "Job name is required.";
     if (!values.jobType.trim()) e.jobType = "Job type is required.";
+    if (!values.jobLocation.trim()) e.jobLocation = "Job location is required.";
     if (!values.jobDescription.trim())
       e.jobDescription = "Job description is required.";
     if (!values.numberOfCandidates.trim())
@@ -83,7 +85,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
   };
 
   const focusFirstError = (errObj) => {
-    const keys = ["jobName", "jobType", "jobDescription", "numberOfCandidates"];
+    const keys = ["jobName", "jobType", "jobLocation", "jobDescription", "numberOfCandidates"];
     for (const k of keys) {
       if (errObj[k] && refs[k]?.current?.focus) {
         refs[k].current.focus();
@@ -109,6 +111,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
       const { data, error } = await supabase.from("job_list").insert({
         name: formData.jobName,
         type: formData.jobType,
+        location: formData.jobLocation,
         description: formData.jobDescription,
         total_candidates: formData.numberOfCandidates,
         min_salary: formData.minSalary ? formData.minSalary : "0",
@@ -143,6 +146,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
       setFormData({
         jobName: editJob.name || "",
         jobType: editJob.type || "",
+        jobLocation: editJob.location || "",
         jobDescription: editJob.description || "",
         numberOfCandidates: editJob.total_candidates || "",
         minSalary: editJob.min_salary || "",
@@ -171,6 +175,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
     return (
       formData.jobName.trim() ||
       formData.jobType.trim() ||
+      formData.jobLocation.trim() ||
       formData.jobDescription.trim() ||
       formData.numberOfCandidates.trim() ||
       formData.minSalary.trim() ||
@@ -191,6 +196,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
       const jobData = {
         name: formData.jobName || "Untitled Job",
         type: formData.jobType,
+        type: formData.jobLocation,
         description: formData.jobDescription,
         total_candidates: formData.numberOfCandidates || "0",
         min_salary: formData.minSalary || "0",
@@ -203,14 +209,14 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
       let result;
 
       if (editJob?.uuid_id) {
-        // Update existing draft
+
         result = await supabase
           .from("job_list")
           .update(jobData)
           .eq("uuid_id", editJob.uuid_id)
           .select();
       } else {
-        // Create new draft
+
         result = await supabase.from("job_list").insert({
           ...jobData,
           created_at: new Date().toISOString(),
@@ -240,7 +246,6 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
     setIsLoading(false);
   };
 
-  // Warn user before closing if form has data
   const handleClose = () => {
     if (hasFormData() && !editJob) {
       const confirmClose = window.confirm(
@@ -308,7 +313,18 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
             handleChange={handleChange}
             isRequired={true}
           />
-
+            <Dropdown
+              label={"Choose Your Domicile"}
+              options={["Jakarta", "Bandung", "Surabaya", "Yogyakarta"]}
+              ref={refs.jobLocation}
+              errorMessage={errors.jobLocation}
+              classError={errors.jobLocation && touched.jobLocation}
+              formData={formData.jobLocation}
+              name={"jobLocation"}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+              isRequired={true}
+            />
           <div className="input-group">
             <label>
               Job Description<span className={styles.required}>*</span>

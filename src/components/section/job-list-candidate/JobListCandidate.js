@@ -11,7 +11,10 @@ export default function JobListCandidate() {
 
   useEffect(() => {
     const fetchJobs = async () => {
-      const { data, error } = await supabase.from("job_list").select("*");
+      const { data, error } = await supabase
+      .from("job_list")
+      .select("*")
+      .eq("status", "Active");
 
       if (error) {
         console.error(error);
@@ -30,61 +33,11 @@ export default function JobListCandidate() {
 
     fetchJobs();
   }, []);
-
-  const jobs = [
-    {
-      id: 1,
-      title: "UX Designer",
-      company: "Rakamin",
-      location: "Jakarta Selatan",
-      salary: "Rp7.000.000 - Rp15.000.000",
-      type: "Full-Time",
-      logo: "💼",
-      description: [
-        "Develop, test, and maintain responsive, high-performance web applications using modern front-end technologies.",
-        "Collaborate with UI/UX designers to translate wireframes and prototypes into functional code.",
-        "Integrate front-end components with APIs and backend services.",
-        "Ensure cross-browser compatibility and optimize applications for maximum speed and scalability.",
-        "Write clean, reusable, and maintainable code following best practices and coding standards.",
-        "Participate in code reviews, contributing to continuous improvement and knowledge sharing.",
-        "Troubleshoot and debug issues to improve usability and overall application quality.",
-        "Stay updated with emerging front-end technologies and propose innovative solutions.",
-        "Collaborate in Agile/Scrum ceremonies, contributing to sprint planning, estimation, and retrospectives.",
-      ],
-    },
-    {
-      id: 3,
-      title: "Frontend Developer",
-      company: "Tech Corp",
-      location: "Jakarta Pusat",
-      salary: "Rp8.000.000 - Rp18.000.000",
-      type: "Full-Time",
-      logo: "💻",
-      description: [
-        "Build and maintain scalable web applications using React and Next.js.",
-        "Work closely with backend developers to integrate RESTful APIs.",
-        "Implement responsive designs and ensure mobile compatibility.",
-        "Optimize application performance and loading times.",
-        "Write unit tests and participate in QA processes.",
-      ],
-    },
-    {
-      id: 4,
-      title: "Frontend Developer",
-      company: "Tech Corp",
-      location: "Jakarta Pusat",
-      salary: "Rp8.000.000 - Rp18.000.000",
-      type: "Full-Time",
-      logo: "💻",
-      description: [
-        "Build and maintain scalable web applications using React and Next.js.",
-        "Work closely with backend developers to integrate RESTful APIs.",
-        "Implement responsive designs and ensure mobile compatibility.",
-        "Optimize application performance and loading times.",
-        "Write unit tests and participate in QA processes.",
-      ],
-    },
-  ];
+  
+  const items = selectedJob?.description
+    .split(/\r?\n/)           
+    .map((s) => s.trim())    
+    .filter(Boolean);  
 
   return (
     <div className={styles.container}>
@@ -145,13 +98,12 @@ export default function JobListCandidate() {
 
           <div className={styles.jobDescription}>
             <ul className={styles.descriptionList}>
-              {/* {selectedJob.description.map((item, index) => (
+              {items?.map((item, index) => (
                 <li key={index} className={styles.descriptionItem}>
                   <span className={styles.bullet}>•</span>
                   <span>{item}</span>
                 </li>
-              ))} */}
-              {selectedJob?.description}
+              ))}
             </ul>
           </div>
         </div>

@@ -36,7 +36,7 @@ export default function JobListCards({ jobs, refetch, updateJobStatus }) {
   };
 
   const toggleStatus = (jobId, currentStatus) => {
-    // Don't allow toggling draft jobs
+    console.log(currentStatus)
     if (currentStatus === "Draft") {
       alert("Please publish the draft first");
       return;
@@ -44,18 +44,15 @@ export default function JobListCards({ jobs, refetch, updateJobStatus }) {
 
     const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
     
-    // Optimistically update UI
     setJobStatuses(prev => ({
       ...prev,
       [jobId]: newStatus
     }));
     
-    // Update in database
     updateJobStatus(jobId, newStatus);
   };
 
   const deleteJob = async (jobId, jobName) => {
-    // Confirm deletion
     const confirmed = window.confirm(
       `Are you sure you want to delete "${jobName}"? This action cannot be undone.`
     );
@@ -126,7 +123,7 @@ export default function JobListCards({ jobs, refetch, updateJobStatus }) {
                       <input
                         type="checkbox"
                         checked={job.status === "Inactive"}
-                        onChange={toggleStatus}
+                        onChange={() => toggleStatus(job.uuid_id, job.status)}
                         className={styles.toggleInput}
                       />
                       <span className={styles.toggleSlider}></span>
