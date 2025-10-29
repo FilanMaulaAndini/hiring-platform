@@ -20,6 +20,7 @@ export default function SuccessApply() {
               career at Rakamin. We look forward to learning more about you
               during the application process.
             </p>
+            <button className="btn btn-tertiary"><a href="/candidate">Back to home</a></button>
           </div>
         </div>
       </div>
