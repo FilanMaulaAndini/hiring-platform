@@ -303,6 +303,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob =
             errorMessage={errors.jobType}
             classError={errors.jobType && touched.jobType}
             formData={formData.jobType}
+            name={"jobType"}
             handleBlur={handleBlur}
             handleChange={handleChange}
             isRequired={true}

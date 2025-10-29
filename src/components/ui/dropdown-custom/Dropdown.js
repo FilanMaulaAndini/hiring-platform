@@ -40,6 +40,7 @@ export default function Dropdown({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   return (
     <div
       ref={dropdownRef}
@@ -54,11 +55,11 @@ export default function Dropdown({
         className={`${styles.selectField} ${classError ? styles.error : ""}`}
       >
         <div
-          className={`${styles.selectInput} ${formData !== undefined ? "" : styles.placehoder}`}
+          className={`${styles.selectInput} ${formData ===  "" ? styles.placehoder : "" }`}
           value={formData}
           onBlur={handleBlur}
         >
-          {formData !== undefined ? formData : "Select the job type"}
+          {formData !== '' ? formData : "Select the job type"}
         </div>
         <RiArrowDownSLine size={20} />
         <div
