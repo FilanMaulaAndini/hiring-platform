@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [includePassword, setIncludePassword] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [errorPass, setErrorPass] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -34,6 +35,17 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
+
+    if(!email){
+      setError("Email wajib diisi.")
+      return;
+    }
+
+    if(!password){
+      setErrorPass("Password wajib diisi.")
+      return;
+    }
+
     try {
       const { data: { session }, error } = await supabase.auth.signInWithPassword({
         email: email,
@@ -105,6 +117,7 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
+                  className={errorPass ? "error" : ""}
                   placeholder="Masukkan kata sandi Anda"
                   onChange={(e) => setPassword(e.target.value)}
                   style={{
@@ -129,6 +142,7 @@ export default function LoginPage() {
                   {showPassword ? <FaEyeSlash /> : <IoEyeSharp />}
                 </div>
               </div>
+              {errorPass && <ErrorMessage message={errorPass} />}
               <div className={`${styles.subtitle} ${styles.end}`}>
                 <UnderlineButton
                   link={"#"}

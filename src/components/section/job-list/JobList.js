@@ -126,7 +126,7 @@ export default function JobListPage() {
             </button>
           </div>
           {jobList.length > 0 ? (
-            <JobListCards jobs={jobList} updateJobStatus={updateJobStatus} />
+            <JobListCards jobs={jobList} refetch={(prev) => setUpdated(!prev)} updateJobStatus={updateJobStatus} />
           ) : (
             <div className={styles.emptyState}>
               <img

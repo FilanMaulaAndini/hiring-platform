@@ -6,7 +6,7 @@ import { supabase } from "../../../../../lib/supabase-client";
 import { useToast } from "@/context/ToastContext";
 import ErrorMessage from "@/components/ui/toast/ErrorMessage";
 
-export default function JobOpeningModal({ isOpen, closeModal, refetch }) {
+export default function JobOpeningModal({ isOpen, closeModal, refetch, editJob = null }) {
   const { toast, showToast } = useToast();
   const [requirements, setRequirements] = useState([
     { key: "fullName", validation: "mandatory" },
@@ -134,12 +134,138 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch }) {
     setIsLoading(false);
   };
 
+
+  const [isDraft, setIsDraft] = useState(false);
+
+  // Load draft or edit data
+  useEffect(() => {
+    if (editJob) {
+      setFormData({
+        jobName: editJob.name || "",
+        jobType: editJob.type || "",
+        jobDescription: editJob.description || "",
+        numberOfCandidates: editJob.total_candidates || "",
+        minSalary: editJob.min_salary || "",
+        maxSalary: editJob.max_salary || "",
+        fields: editJob.fields || requirements,
+      });
+      setIsDraft(editJob.status === "Draft");
+    }
+  }, [editJob]);
+
+  // Auto-save draft every 30 seconds
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const autoSaveInterval = setInterval(() => {
+      if (hasFormData()) {
+        handleSaveAsDraft(true); // true = silent save
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(autoSaveInterval);
+  }, [isOpen, formData]);
+
+  // Check if form has any data
+  const hasFormData = () => {
+    return (
+      formData.jobName.trim() ||
+      formData.jobType.trim() ||
+      formData.jobDescription.trim() ||
+      formData.numberOfCandidates.trim() ||
+      formData.minSalary.trim() ||
+      formData.maxSalary.trim()
+    );
+  };
+
+  // Save as Draft
+  const handleSaveAsDraft = async (silent = false) => {
+    if (!hasFormData()) {
+      if (!silent) showToast("Please fill in at least one field", "error");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const jobData = {
+        name: formData.jobName || "Untitled Job",
+        type: formData.jobType,
+        description: formData.jobDescription,
+        total_candidates: formData.numberOfCandidates || "0",
+        min_salary: formData.minSalary || "0",
+        max_salary: formData.maxSalary || "0",
+        fields: requirements,
+        status: "Draft",
+        updated_at: new Date().toISOString(),
+      };
+
+      let result;
+
+      if (editJob?.uuid_id) {
+        // Update existing draft
+        result = await supabase
+          .from("job_list")
+          .update(jobData)
+          .eq("uuid_id", editJob.uuid_id)
+          .select();
+      } else {
+        // Create new draft
+        result = await supabase.from("job_list").insert({
+          ...jobData,
+          created_at: new Date().toISOString(),
+        }).select();
+      }
+
+      const { data, error } = result;
+
+      if (error) {
+        console.error(error);
+        if (!silent) showToast(error.message, "error");
+      } else {
+        if (!silent) {
+          showToast("Draft saved successfully!", "success");
+          closeModal();
+          setFormData(initial);
+          setErrors({});
+          setTouched({});
+        }
+        refetch();
+      }
+    } catch (err) {
+      console.error(err);
+      if (!silent) showToast("Error saving draft", "error");
+    }
+
+    setIsLoading(false);
+  };
+
+  // Warn user before closing if form has data
+  const handleClose = () => {
+    if (hasFormData() && !editJob) {
+      const confirmClose = window.confirm(
+        "You have unsaved changes. Do you want to save as draft before closing?"
+      );
+      
+      if (confirmClose) {
+        handleSaveAsDraft();
+        return;
+      }
+    }
+    
+    closeModal();
+    setFormData(initial);
+    setErrors({});
+    setTouched({});
+  };
+
+
   return (
     <div className={`${styles.modalOverlay} ${isOpen ? styles.show : ""}`}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>Job Opening</h2>
-          <button className={styles.closeBtn} onClick={closeModal}>
+          <button className={styles.closeBtn} onClick={handleClose}>
             ✕
           </button>
         </div>

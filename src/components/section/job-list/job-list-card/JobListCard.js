@@ -1,12 +1,27 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./JobListCard.module.css";
 import { useRouter } from "next/navigation";
 import moment from "moment";
+import { supabase } from "../../../../../lib/supabase-client";
+import { useToast } from "@/context/ToastContext";
 
-export default function JobListCards({ jobs, updateJobStatus }) {
+export default function JobListCards({ jobs, refetch, updateJobStatus }) {
   const router = useRouter();
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [jobStatuses, setJobStatuses] = useState({});
+  const [isDeleting, setIsDeleting] = useState(null);
+  const { toast, showToast } = useToast();
+
+
+  useEffect(() => {
+    if (jobs && jobs.length > 0) {
+      const initialStatuses = {};
+      jobs.forEach(job => {
+        initialStatuses[job.uuid_id] = job.status;
+      });
+      setJobStatuses(initialStatuses);
+    }
+  }, [jobs]);
 
   const getStatusStyles = (status) => {
     switch (status) {
@@ -21,21 +36,71 @@ export default function JobListCards({ jobs, updateJobStatus }) {
     }
   };
 
-  const handleDetailClick = (uuid_id) => {
-    router.push(`/admin/manage-candidate?job_id=${uuid_id}`);
+  const toggleStatus = (jobId, currentStatus) => {
+    // Don't allow toggling draft jobs
+    if (currentStatus === "Draft") {
+      alert("Please publish the draft first");
+      return;
+    }
+
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+    
+    // Optimistically update UI
+    setJobStatuses(prev => ({
+      ...prev,
+      [jobId]: newStatus
+    }));
+    
+    // Update in database
+    updateJobStatus(jobId, newStatus);
+  };
+
+  const deleteJob = async (jobId, jobName) => {
+    // Confirm deletion
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${jobName}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setIsDeleting(jobId);
+
+    try {
+      const { error } = await supabase
+        .from("job_list")
+        .delete()
+        .eq("uuid_id", jobId);
+
+      if (error) {
+        console.error("Error deleting job:", error);
+        showToast?.("Failed to delete job", "error");
+      } else {
+        showToast?.("Job deleted successfully", "success");
+        refetch(); // Refresh the job list
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      showToast?.("Error deleting job", "error");
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  const handleDetailClick = (uuid_id, isDraft, name) => {
+    if(isDraft){
+      deleteJob(uuid_id, name)
+    } else {
+      router.push(`/admin/manage-candidate?job_id=${uuid_id}`);
+    }
   };
 
   return (
     <div>
       <div className={styles.jobList}>
         {jobs.map((job) => {
-          const statusStyle = getStatusStyles(job.status);
-          const [isActive, setIsActive] = useState(job.status);
-          const newStatus = isActive ? "Inactive" : "Active";
-          const toggleStatus = () => {
-            setIsActive(!isActive);
-            updateJobStatus(job.uuid_id, newStatus);
-          };
+           const currentStatus = jobStatuses[job.uuid_id] || job.status;
+           const statusStyle = getStatusStyles(currentStatus);
+           const isDraft = currentStatus === "Draft";
 
           return (
             <div key={job.uuid_id} className={styles.jobCard}>
@@ -56,18 +121,20 @@ export default function JobListCards({ jobs, updateJobStatus }) {
                   </div>
                 </div>
 
-                <div className={styles.toggleContainer}>
-                  <label className={styles.toggleLabel}>
-                    <input
-                      type="checkbox"
-                      checked={job.status === "Inactive"}
-                      onChange={toggleStatus}
-                      className={styles.toggleInput}
-                    />
-                    <span className={styles.toggleSlider}></span>
-                  </label>
-                  <span className={styles.toggleText}>Inactive</span>
-                </div>
+                {!isDraft && (
+                  <div className={styles.toggleContainer}>
+                    <label className={styles.toggleLabel}>
+                      <input
+                        type="checkbox"
+                        checked={job.status === "Inactive"}
+                        onChange={toggleStatus}
+                        className={styles.toggleInput}
+                      />
+                      <span className={styles.toggleSlider}></span>
+                    </label>
+                    <span className={styles.toggleText}>Inactive</span>
+                  </div>
+                )}
               </div>
 
               <div className={styles.jobContent}>
@@ -82,10 +149,10 @@ export default function JobListCards({ jobs, updateJobStatus }) {
                   </p>
                 </div>
                 <button
-                  className="btn btn-tertiary"
-                  onClick={() => handleDetailClick(job.uuid_id)}
+                  className={`btn ${isDraft ? "btn-danger" : "btn-tertiary"}`}
+                  onClick={() => handleDetailClick(job.uuid_id, isDraft, job.name)}
                 >
-                  Manage Job
+                  {isDraft ? "Delete" : "Manage Job"}
                 </button>
               </div>
             </div>

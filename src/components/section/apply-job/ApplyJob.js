@@ -168,12 +168,12 @@ export default function ApplyJob() {
       const rule = fieldSettings[key];
       const value = values[key]?.trim?.() || "";
   
-      console.log(`\nChecking field: ${key}`);
-      console.log(`Rule: ${rule}`);
-      console.log(`Value: "${value}"`);
+      // console.log(`\nChecking field: ${key}`);
+      // console.log(`Rule: ${rule}`);
+      // console.log(`Value: "${value}"`);
   
       if (rule === "off") {
-        console.log(`⏭️ Skipping ${key} (rule is off)`);
+        //console.log(`⏭️ Skipping ${key} (rule is off)`);
         continue;
       }
   
@@ -187,28 +187,29 @@ export default function ApplyJob() {
       // Email validation
       if (key === "email" && value) {
         const isValid = validateEmail(value);
-        if (!isValid) {
+        console.log("isValid", isValid)
+        if (isValid !== "") {
           e[key] = "Please enter your email in the format: name@example.com";
         
         }
       }
   
-      // LinkedIn validation
+      
       if (key === "linkedinLink" && value) {
-        console.log(`Validating LinkedIn: ${value}`);
+        //console.log(`Validating LinkedIn: ${value}`);
         const linkedinRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?$/;
         const isValid = linkedinRegex.test(value);
-        console.log(`LinkedIn valid? ${isValid}`);
+        //console.log(`LinkedIn valid? ${isValid}`);
         
         if (!isValid) {
           e[key] = "Please copy paste your LinkedIn URL, e.g., https://www.linkedin.com/in/username";
-          console.log(`❌ LinkedIn validation failed`);
+          //console.log(`❌ LinkedIn validation failed`);
         }
       }
     }
   
-    console.log("\n=== FINAL ERRORS ===");
-    console.log(e);
+    // console.log("\n=== FINAL ERRORS ===");
+    // console.log(e);
     return e;
   };
 

@@ -34,7 +34,11 @@ export default function RegisterPage() {
   };
 
   const handleRegisterClick = async () => {
-    setError("");
+    if(!email){
+      setError("Email wajib diisi.")
+      return;
+    }
+
     try {
       // const { data: authData, error: authError } = await supabase.auth.signInWithOtp({
       //   email: email,
