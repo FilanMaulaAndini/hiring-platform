@@ -53,7 +53,7 @@ export default function RegisterPage() {
           email: email,
           password: "Password123",
           options: {
-            emailRedirectTo: "http://localhost:3000/auth/callback",
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
 

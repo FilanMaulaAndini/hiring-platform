@@ -17,14 +17,12 @@ export default function Callback() {
         } = await supabase.auth.getSession();
 
         if (sessionError) {
-          console.error("Session error:", sessionError);
           setError(sessionError.message);
           router.push("/");
           return;
         }
 
         if (!session) {
-          console.log("No session found");
           router.push("/");
           return;
         }
