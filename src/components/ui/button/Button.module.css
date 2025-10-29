@@ -1,0 +1,10 @@
+.underlineButton a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.underlineButton a:hover {
+  text-decoration: underline;
+}

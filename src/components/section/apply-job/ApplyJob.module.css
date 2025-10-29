@@ -1,0 +1,168 @@
+.pageWrapper {
+  background: var(--foreground);
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.formSection {
+  max-width: 700px;
+  width: 100%;
+  background: var(--background);
+  border: 1px solid var(--color-light-grey);
+  border-radius: 12px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  font-size: 16px;
+  gap: 16px;
+}
+
+.backButton {
+  width: 28px;
+  height: 28px;
+  background: var(--color-light);
+  border: 1px solid var(--color-light-grey);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.backButton:hover {
+  border-color: var(--color-grey);
+  background: var(--color-light-grey);
+}
+
+.titleSection {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mainTitle {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.subtitle {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.formBody {
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.requiredText {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--color-danger);
+}
+
+.required {
+  color: var(--color-danger);
+  font-size: 16px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.fieldLabelBold {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.profilePictureSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avatarDisplay {
+  width: 128px;
+  height: 128px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar.active {
+  background: var(--color-light-grey);
+}
+
+.radioGroup {
+  display: flex;
+}
+
+.pronounWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-secondary);
+}
+
+.footerActions {
+  width: 100%;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-light-grey);
+}
+
+.submitButton {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding: 20px;
+  }
+
+  .formSection {
+    padding: 24px;
+  }
+
+  .formBody {
+    padding: 0 12px;
+  }
+
+  .footerActions {
+    padding: 16px 24px;
+    margin: 0 -24px -24px -24px;
+  }
+}

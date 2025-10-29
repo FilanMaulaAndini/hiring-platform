@@ -1,0 +1,66 @@
+.signIn {
+  background-color: var(--foreground);
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  width: 100%;
+  max-width: 500px;
+  height: 356px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  gap: 32px;
+}
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 420px;
+  height: 276px;
+}
+
+.verifyCaption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+}
+
+.desc {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.container {
+  width: 184px;
+  height: 184px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.successApply {
+  width: 184px;
+  height: 158px;
+  object-fit: contain;
+}

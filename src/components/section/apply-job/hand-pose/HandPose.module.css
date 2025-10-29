@@ -1,0 +1,262 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modalContent {
+  background: var(--background);
+  position: relative;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader,
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+}
+
+.modalHeader {
+  position: sticky;
+  background: var(--background);
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.modalTitle {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0rem 2rem 2rem 2rem;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-grey);
+  cursor: pointer;
+}
+
+.cameraBox {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #475569;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.iconBtn:hover {
+  background: #f1f5f9;
+}
+
+.videoWrapper {
+  position: relative;
+  background: black;
+}
+
+.videoWrapper video {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.hidden {
+  display: none;
+}
+
+.countdownWrapper {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.countdownTitle {
+  font-size: 6rem;
+}
+
+.detecting {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #16a34a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dotPulse {
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
+.instructions {
+  padding: 1rem 0rem;
+  line-height: 1.5rem;
+}
+
+.poseList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.poseCard {
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: 0.3s;
+}
+
+.activePose {
+  background: var(--color-primary);
+}
+
+.donePose {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.poseInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.poseIcon {
+  font-size: 1.5rem;
+}
+
+.poseName {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.poseDesc {
+  font-size: 0.75rem;
+  color: #0d9488;
+  margin-top: 0.25rem;
+}
+
+.startBtn {
+  width: 100%;
+  background: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.startBtn:hover {
+  background: #0f766e;
+}
+
+.successHeader {
+  background: #f0fdf4;
+  border-bottom: 1px solid #bbf7d0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.photo {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.btnGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.useBtn {
+  flex: 1;
+  background: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.useBtn:hover {
+  background: #0f766e;
+}

@@ -1,0 +1,227 @@
+.pageContainer {
+  min-height: 100vh;
+  background: var(--background);
+  padding: 2rem;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modalContent {
+  background: var(--background);
+  position: relative;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader,
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.modalHeader {
+  position: sticky;
+  background: var(--background);
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.modalTitle {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-grey);
+  cursor: pointer;
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+.formLabel {
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--color-secondary);
+}
+
+.salaryGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.salaryInputWrapper {
+  position: relative;
+}
+
+.salaryPrefix {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+.sectionTitle {
+  font-weight: 700;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--color-light-grey);
+}
+
+@media (max-width: 768px) {
+  .modalContent {
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .salaryGroup {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaCard {
+    padding: 2rem 1.5rem;
+  }
+}
+
+.wrapperRequired {
+  border: 2px solid var(--color-light-grey);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  font-size: 12px;
+}
+
+.formTitle {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.fieldsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fieldRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.fieldRow:last-child {
+  border-bottom: none;
+}
+
+.fieldLabel {
+  font-weight: 400;
+}
+
+.optionsGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+.optionBtn {
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: var(--color-light);
+  color: var(--color-secondary);
+  border-color: var(--color-light-grey);
+}
+
+.optionBtn.active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.optionBtn:not(.off):hover {
+  transform: translateY(-2px);
+}
+
+.optionBtn.disabled,
+.optionBtn:disabled {
+  background: #f3f4f6;
+  color: #d1d5db;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+}
+
+.optionBtn.disabled:hover,
+.optionBtn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+@media (max-width: 768px) {
+  .fieldRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+  }
+
+  .optionsGroup {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .optionsGroup {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .optionBtn {
+    width: 100%;
+    text-align: center;
+  }
+}

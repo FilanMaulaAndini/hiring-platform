@@ -1,0 +1,204 @@
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.selectLabel {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.dateInput {
+  width: 100%;
+  height: 40px;
+  padding: 8px 16px;
+  border: 2px solid var(--color-light-grey);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-secondary);
+  background: var(--color-light);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 169, 173, 0.1);
+}
+
+.dateInput.error {
+  border: 2px solid var(--color-danger);
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.required {
+  color: var(--color-danger);
+  font-size: 16px;
+}
+
+.calendarIcon {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.pickerDropdown {
+  position: absolute;
+  z-index: 50;
+  top: 100%;
+  margin-top: 8px;
+  background: var(--background);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  border: 1px solid var(--light-grey);
+  width: 320px;
+}
+
+.pickerDropdown.wide {
+  width: 380px;
+}
+
+.pickerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.navButton {
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.navButton:hover {
+  background-color: var(--color-light-grey);
+}
+
+.navButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+.headerText {
+  font-size: 14px;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 16px;
+  transition: color 0.2s;
+}
+
+.headerText:hover {
+  color: var(--color-primary);
+}
+
+.dayNames {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dayName {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-grey);
+  padding: 8px 0;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dayButton {
+  padding: 8px 0;
+  font-size: 12px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dayButton.other-month {
+  color: #d1d5db;
+}
+
+.dayButton.selected {
+  background-color: var(--color-primary);
+  color: var(--color-light);
+  font-weight: 600;
+}
+
+.dayButton.today:not(.selected) {
+  border: 2px solid var(--color-primary);
+}
+
+.dayButton.currentMonth:not(.selected):hover {
+  background-color: var(--color-grey);
+}
+
+.monthsGrid,
+.yearsGrid,
+.decadesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.monthButton,
+.yearButton,
+.decadeButton {
+  padding: 12px 0;
+  font-size: 12px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.monthButton:hover,
+.yearButton.current:hover,
+.decadeButton.current:hover {
+  background-color: var(--color-light-grey);
+}
+
+.yearButton.other,
+.decadeButton.other {
+  color: #d1d5db;
+}
+
+.decadeButton {
+  font-size: 12px;
+}
+
+.chevronIcon {
+  width: 20px;
+  height: 20px;
+}

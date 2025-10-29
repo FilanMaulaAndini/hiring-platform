@@ -1,0 +1,150 @@
+.jobList {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.jobCard {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  font-size: 14px;
+}
+
+.jobCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.jobHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statusWrapper {
+  display: flex;
+  gap: 1.5rem;
+}
+.statusBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 1px solid;
+  text-transform: capitalize;
+}
+
+.dateBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid var(--color-light-grey);
+}
+
+.jobContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.jobInfo {
+  flex: 1;
+}
+
+.jobTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.jobSalary {
+  color: var(--color-secondary);
+}
+
+.toggleContainer {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggleLabel {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  display: inline-block;
+}
+
+.toggleInput {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+.toggleSlider::before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggleInput:checked + .toggleSlider {
+  background-color: var(--color-primary);
+}
+
+.toggleInput:checked + .toggleSlider::before {
+  transform: translateX(20px);
+}
+
+.toggleText {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .jobCard {
+    padding: 1.5rem;
+  }
+
+  .jobContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .manageBtn {
+    width: 100%;
+  }
+
+  .jobHeader {
+    flex-wrap: wrap;
+  }
+
+  .jobTitle {
+    font-size: 1.25rem;
+  }
+}

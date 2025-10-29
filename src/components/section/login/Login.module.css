@@ -1,0 +1,86 @@
+.logInPage {
+  background-color: var(--foreground);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.registerBox {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  min-height: 454px;
+  background: var(--color-light);
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.logo {
+  width: 145px;
+  height: 50px;
+  background: url("/images/logo.png") no-repeat center/contain;
+  margin-bottom: 20px;
+}
+
+.signUpBox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.subtitle {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 24px;
+  gap: 0.25rem;
+}
+.subtitle.end {
+  justify-content: end;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+  color: var(--color-grey);
+  font-size: 12px;
+}
+
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--color-grey);
+}
+
+@media (max-width: 768px) {
+  .registerBox {
+    width: 90%;
+    padding: 24px;
+  }
+
+  .logo {
+    margin: 0 auto 16px auto;
+  }
+
+  .title {
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+  }
+}
