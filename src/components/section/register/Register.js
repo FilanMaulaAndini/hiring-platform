@@ -53,7 +53,7 @@ export default function RegisterPage() {
       }
 
       const { data: authData, error: authError } =
-        await supabase.auth.signInWithOtp({
+        await supabase.auth.signUp({
           email: email,
           password: "Password123",
           options: {
