@@ -187,7 +187,7 @@ export default function ApplyJob() {
       // Email validation
       if (key === "email" && value) {
         const isValid = validateEmail(value);
-        console.log("isValid", isValid)
+        // console.log("isValid", isValid)
         if (isValid !== "") {
           e[key] = "Please enter your email in the format: name@example.com";
         

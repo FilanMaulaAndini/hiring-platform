@@ -99,6 +99,7 @@
 
 .overlay {
   position: absolute;
+  z-index: 2;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.7);
 }
@@ -140,10 +141,13 @@
   }
 
   .content {
-    padding: 16px;
-    flex-direction: column;
-    align-items: center;
+    height: auto;
+    grid-template-columns: 1fr;
     gap: 1rem;
+  }
+
+  .overlay {
+    display: none;
   }
 
   .searchContainer {
@@ -168,6 +172,10 @@
     height: auto;
     border-radius: 12px;
     background-size: cover;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 5;
   }
 
   .cardContent {

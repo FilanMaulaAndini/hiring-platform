@@ -12,7 +12,6 @@ export default function JobListCards({ jobs, refetch, updateJobStatus }) {
   const [isDeleting, setIsDeleting] = useState(null);
   const { toast, showToast } = useToast();
 
-
   useEffect(() => {
     if (jobs && jobs.length > 0) {
       const initialStatuses = {};
