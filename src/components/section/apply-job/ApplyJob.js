@@ -12,11 +12,14 @@ import { useToast } from "@/context/ToastContext";
 import { supabase } from "../../../../lib/supabase-client";
 import ErrorMessage from "@/components/ui/toast/ErrorMessage";
 import { useSearchParams } from "next/navigation";
+import { validateEmail } from "@/components/helper/validate-email";
 
 export default function ApplyJob() {
   const router = useRouter();
   const jobId = useSearchParams().get("job_id");
+  const [userId, setUserId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [jobFields, setJobFields] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const initial = {
     profilePicture: null,
@@ -25,7 +28,7 @@ export default function ApplyJob() {
     dateOfBirth: "",
     pronoun: "",
     phoneNumber: "",
-    linkedin: "",
+    linkedinLink: "",
   };
   const [formData, setFormData] = useState(initial);
   const { toast, showToast } = useToast();
@@ -38,21 +41,72 @@ export default function ApplyJob() {
     pronoun: useRef(null),
     domicile: useRef(null),
     phoneNumber: useRef(null),
-    linkedin: useRef(null),
+    linkedinLink: useRef(null),
   };
+
+  useEffect(() => {
+    const getJobFields = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("job_list")
+          .select("fields")
+          .eq("uuid_id", jobId)
+          .maybeSingle(); 
+        
+        console.log("data", data);
+    
+        if (error) {
+          console.error("Error message:", error.message);
+          return null;
+        }
+        
+        if (!data || !data.fields) {
+          console.log("No fields found");
+          return null;
+        }
+    
+        // data.fields is the array, not data itself
+        const updatedFields = data.fields.filter(
+          (field) => field.key !== "photoProfile"
+        );
+        
+        setJobFields(updatedFields);
+        console.log("updated", updatedFields);
+        
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getUserId();
+    getJobFields();
+  }, []);
+  
+  const getUserId = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      setUserId(session.user.id);
+      console.log("User ID:", session.user.id);
+      console.log("User Email:", session.user.email);
+    }
+  };
+
+ 
+
 
   const fieldRulesFromDB = [
     { key: "fullName", validation: "mandatory" },
-    { key: "photoProfile", validation: "mandatory" },
+    //{ key: "photoProfile", validation: "mandatory" },
     { key: "pronoun", validation: "mandatory" },
     { key: "domicile", validation: "mandatory" },
     { key: "email", validation: "mandatory" },
     { key: "phoneNumber", validation: "mandatory" },
-    { key: "linkedin", validation: "mandatory" },
+    { key: "linkedinLink", validation: "mandatory" },
     { key: "dateOfBirth", validation: "mandatory" },
   ];
 
-  const fieldSettings = fieldRulesFromDB.reduce((acc, { key, validation }) => {
+  const fieldSettings = jobFields.reduce((acc, { key, validation }) => {
     acc[key] = validation;
     return acc;
   }, {});
@@ -63,36 +117,98 @@ export default function ApplyJob() {
   });
   const { isVisible, isRequired } = getFieldRules(fieldSettings);
 
+  // const validate = (values) => {
+  //   const e = {};
+  
+  //   // Validation rules for different field types
+  //   const validators = {
+  //     email: {
+  //       regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  //       message: "Please enter your email in the format: name@example.com"
+  //     },
+  //     linkedinLink: {
+  //       regex: /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?$/,
+  //       message: "Please copy paste your LinkedIn URL, e.g., https://www.linkedin.com/in/username"
+  //     }
+  //   };
+  
+  //   for (const key in fieldSettings) {
+  //     const rule = fieldSettings[key];
+  //     const value = values[key]?.trim?.() || "";
+  
+  //     // Skip if validation is off
+  //     if (rule === "off") continue;
+  
+  //     // Check mandatory fields
+  //     if (rule === "mandatory" && !value) {
+  //       e[key] = "Required";
+  //       continue;
+  //     }
+  
+  //     // Apply format validation if value exists and validator is defined
+  //     if (value && validators[key]) {
+  //       const validator = validators[key];
+  //       if (!validator.regex.test(value)) {
+  //         e[key] = validator.message;
+  //       }
+  //     }
+  //   }
+  
+  //   return e;
+  // };
+
   const validate = (values) => {
     const e = {};
-
+  
+    console.log("=== VALIDATION DEBUG ===");
+    console.log("fieldSettings:", fieldSettings);
+    console.log("values:", values);
+  
     for (const key in fieldSettings) {
       const rule = fieldSettings[key];
       const value = values[key]?.trim?.() || "";
-
-      if (rule === "off") continue;
-
+  
+      console.log(`\nChecking field: ${key}`);
+      console.log(`Rule: ${rule}`);
+      console.log(`Value: "${value}"`);
+  
+      if (rule === "off") {
+        console.log(`⏭️ Skipping ${key} (rule is off)`);
+        continue;
+      }
+  
+      // Check mandatory
       if (rule === "mandatory" && !value) {
         e[key] = "Required";
+        
+        continue;
       }
-
-      if (rule !== "off" && key === "email" && value) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-          e.email = "Please enter your email in the format: name@example.com";
+  
+      // Email validation
+      if (key === "email" && value) {
+        const isValid = validateEmail(value);
+        if (!isValid) {
+          e[key] = "Please enter your email in the format: name@example.com";
+        
         }
       }
-
-      if (rule !== "off" && key === "linkedin" && value) {
-        const linkedinRegex =
-          /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?$/;
-        if (!linkedinRegex.test(value)) {
-          e.linkedin =
-            "Please copy paste your LinkedIn URL, e.g., https://www.linkedin.com/in/username";
+  
+      // LinkedIn validation
+      if (key === "linkedinLink" && value) {
+        console.log(`Validating LinkedIn: ${value}`);
+        const linkedinRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?$/;
+        const isValid = linkedinRegex.test(value);
+        console.log(`LinkedIn valid? ${isValid}`);
+        
+        if (!isValid) {
+          e[key] = "Please copy paste your LinkedIn URL, e.g., https://www.linkedin.com/in/username";
+          console.log(`❌ LinkedIn validation failed`);
         }
       }
     }
-
+  
+    console.log("\n=== FINAL ERRORS ===");
+    console.log(e);
     return e;
   };
 
@@ -120,7 +236,7 @@ export default function ApplyJob() {
       "pronoun",
       "domicile",
       "phoneNumber",
-      "linkedin",
+      "linkedinLink",
     ];
     for (const k of keys) {
       if (errObj[k] && refs[k]?.current?.focus) {
@@ -147,9 +263,9 @@ export default function ApplyJob() {
       pronoun: true,
       domicile: true,
       phoneNumber: true,
-      linkedin: true,
+      linkedinLink: true,
     });
-
+console.log(eObj)
     if (Object.keys(eObj).length === 0) {
       let imageUrl = null;
 
@@ -181,15 +297,16 @@ export default function ApplyJob() {
       }
 
       const { data, error } = await supabase.from("candidate").insert({
+        user_id: userId,
         job_id: jobId,
         photo_profile: imageUrl,
         name: formData.fullName,
-        birth_date: formData.dateOfBirth,
+        birth_date: formData.dateOfBirth ? formData.dateOfBirth : null,
         pronoun: formData.pronoun,
         email: formData.email,
         phone_numbers: formData.phoneNumber,
         domicile: formData.domicile,
-        linkedin: formData.linkedin,
+        linkedin: formData.linkedinLink,
       });
 
       if (error) {
@@ -379,27 +496,27 @@ export default function ApplyJob() {
               )}
             </div>
           )}
-          {isVisible("linkedin") && (
+          {isVisible("linkedinLink") && (
             <div className="input-group">
               <label>
                 Link LinkedIn
-                {isRequired("linkedin") && (
+                {isRequired("linkedinLink") && (
                   <span className={styles.required}>*</span>
                 )}
               </label>
               <input
-                required={isRequired("linkedin")}
+                required={isRequired("linkedinLink")}
                 ref={refs.linkedin}
                 type="url"
-                name="linkedin"
+                name="linkedinLink"
                 placeholder="https://linkedin.com/in/username"
                 value={formData.linkedin}
-                className={errors.linkedin && touched.linkedin ? "error" : ""}
+                className={errors.linkedinLink && touched.linkedinLink ? "error" : ""}
                 onBlur={handleBlur}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
               />
-              {errors.linkedin && touched.linkedin && (
-                <ErrorMessage message={errors.linkedin} />
+              {errors.linkedinLink && touched.linkedinLink && (
+                <ErrorMessage message={errors.linkedinLink} />
               )}
             </div>
           )}

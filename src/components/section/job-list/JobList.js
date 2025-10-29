@@ -36,19 +36,25 @@ export default function JobListPage() {
   }, [isUpdated]);
 
   const updateJobStatus = async (jobId, newStatus) => {
-    const { data, error } = await supabase
-      .from("job_list")
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
-      .eq("uuid_id", jobId)
-      .select();
+    try {
+      const { data, error } = await supabase
+        .from("job_list")
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq("uuid_id", jobId)
+        .select();
 
-    if (error) {
-      console.error("Error updating status:", error);
-      return null;
-    } else {
-      setJobList((prev) =>
-        prev.map((j) => (j.uuid_id === jobId ? { ...j, status: newStatus } : j))
-      );
+      if (error) {
+        console.error("Error updating status:", error);
+        return null;
+      } else {
+        setJobList((prev) =>
+          prev.map((j) =>
+            j.uuid_id === jobId ? { ...j, status: newStatus } : j
+          )
+        );
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 

@@ -11,7 +11,7 @@ export default function JobOpeningModal({ isOpen, closeModal, refetch }) {
   const [requirements, setRequirements] = useState([
     { key: "fullName", validation: "mandatory" },
     { key: "photoProfile", validation: "mandatory" },
-    { key: "gender", validation: "mandatory" },
+    { key: "pronoun", validation: "mandatory" },
     { key: "domicile", validation: "mandatory" },
     { key: "email", validation: "mandatory" },
     { key: "phoneNumber", validation: "mandatory" },
@@ -290,8 +290,8 @@ function ProfileRequirements({ requirements, setRequirements }) {
       allowedOptions: ["mandatory", "optional", "off"],
     },
     {
-      id: "gender",
-      label: "Gender",
+      id: "pronoun",
+      label: "Pronoun",
       allowedOptions: ["mandatory", "optional", "off"],
     },
     {

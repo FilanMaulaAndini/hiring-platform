@@ -6,260 +6,289 @@ import { FaChevronRight } from "react-icons/fa6";
 
 export default function HandPose({ isOpen, closeModal, handleChange }) {
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [currentPose, setCurrentPose] = useState(0);
-  // const [countdown, setCountdown] = useState(null);
-  // const [isDetecting, setIsDetecting] = useState(false);
-  // const [stream, setStream] = useState(null);
-  const [handLandmarker, setHandLandmarker] = useState(null);
-  const [cameraStream, setCameraStream] = useState(null);
-  const [stage, setStage] = useState(3); // gesture stage (3→2→1)
-  const [countdown, setCountdown] = useState(null);
-  const [photo, setPhoto] = useState(null);
-  const [isCounting, setIsCounting] = useState(false);
-  const [isDetecting, setIsDetecting] = useState(true);
-  const [retakePhoto, setRetakePhoto] = useState(false);
+const canvasRef = useRef(null);
 
-  const poses = [
-    {
-      id: 3,
-      name: "3 fingers",
-      icon: "/icons/three-fingers.svg",
-      // description: "Point one finger upward",
-    },
-    {
-      id: 2,
-      name: "2 fingers",
-      icon: "/icons/two-fingers.svg",
-      // description: "Show peace sign with two fingers",
-    },
-    {
-      id: 1,
-      name: "1 finger",
-      icon: "/icons/one-finger.svg",
-      // description: "Raise your hand with fingers spread",
-    },
-  ];
+// Change these from let to useRef
+const animationFrameIdRef = useRef(null);
+const activeStreamRef = useRef(null);
+const lastGestureRef = useRef(null);
+const stageProgressRef = useRef(3);
 
-  useEffect(() => {
-    const initModel = async () => {
-      try {
-        const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
-        );
+const [currentPose, setCurrentPose] = useState(0);
+const [handLandmarker, setHandLandmarker] = useState(null);
+const [cameraStream, setCameraStream] = useState(null);
+const [stage, setStage] = useState(3);
+const [countdown, setCountdown] = useState(null);
+const [photo, setPhoto] = useState(null);
+const [isCounting, setIsCounting] = useState(false);
+const [isDetecting, setIsDetecting] = useState(true);
+const [retakePhoto, setRetakePhoto] = useState(false);
 
-        const landmarker = await HandLandmarker.createFromOptions(vision, {
-          baseOptions: {
-            modelAssetPath:
-              "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
-          },
-          runningMode: "VIDEO",
-          numHands: 1,
-        });
+// ✅ Your poses array
+const poses = [
+  {
+    id: 3,
+    name: "3 fingers",
+    icon: "/icons/three-fingers.svg",
+  },
+  {
+    id: 2,
+    name: "2 fingers",
+    icon: "/icons/two-fingers.svg",
+  },
+  {
+    id: 1,
+    name: "1 finger",
+    icon: "/icons/one-finger.svg",
+  },
+];
 
-        setHandLandmarker(landmarker);
-        console.log("✅ HandLandmarker loaded successfully");
-      } catch (err) {
-        console.error("❌ Failed to initialize model:", err);
-      }
-    };
-
-    initModel();
-  }, [retakePhoto]);
-
-  // Camera + detection loop
-  useEffect(() => {
-    if (!isOpen || !handLandmarker) return;
-
-    startCamera();
-
-    return () => {
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      if (activeStream?.getTracks)
-        activeStream.getTracks().forEach((t) => t.stop());
-      if (videoRef.current) videoRef.current.srcObject = null;
-    };
-  }, [isOpen, handLandmarker]);
-
-  // useEffect(() => {
-  //   if (photo) {
-  //     // stop camera + mediapipe
-  //     if (animationFrameId.current)
-  //       cancelAnimationFrame(animationFrameId.current);
-  //     if (activeStream?.getTracks)
-  //       activeStream.getTracks().forEach((t) => t.stop());
-  //     if (videoRef.current) videoRef.current.srcObject = null;
-  //     console.log("Camera stopped because photo was captured.");
-  //   }
-  // }, [photo]);
-
-  let animationFrameId;
-  let activeStream = null;
-  let lastGesture = null;
-  let stageProgress = 3;
-
-  const startCamera = async () => {
+useEffect(() => {
+  const initModel = async () => {
     try {
-      console.log("start again");
-      lastGesture = null;
-      stageProgress = 3;
-      setStage(stageProgress);
-      setIsDetecting(true);
-      setIsCounting(false);
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
+      );
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480 },
+      const landmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+            "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+        },
+        runningMode: "VIDEO",
+        numHands: 1,
       });
-      activeStream = mediaStream;
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
-      }
-
-      detectHands();
+      setHandLandmarker(landmarker);
+      console.log("✅ HandLandmarker loaded successfully");
     } catch (err) {
-      console.error("❌ Error accessing camera:", err);
+      console.error("❌ Failed to initialize model:", err);
     }
   };
 
-  const detectHands = () => {
-    console.log("hands again");
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+  initModel();
+}, [retakePhoto]);
 
-    const ctx = canvas.getContext("2d");
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
+// Camera + detection loop
+useEffect(() => {
+  if (!isOpen || !handLandmarker) return;
 
-    const renderFrame = async () => {
-      console.log("render again");
-      if (!handLandmarker || !video || video.readyState < 2) {
-        animationFrameId = requestAnimationFrame(renderFrame);
-        return;
-      }
+  startCamera();
 
-      const startTimeMs = performance.now();
-      const results = await handLandmarker.detectForVideo(video, startTimeMs);
+  return () => {
+    stopCamera();
+  };
+}, [isOpen, handLandmarker, retakePhoto]);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+const startCamera = async () => {
+  try {
+    console.log("start again");
+    
+    // Stop existing camera first
+    stopCamera();
+    
+    // Reset refs
+    lastGestureRef.current = null;
+    stageProgressRef.current = 3;
+    
+    setStage(3);
+    setIsDetecting(true);
+    setIsCounting(false);
+    setCountdown(null);
 
-      if (!isCounting && results.landmarks?.length > 0 && isDetecting) {
-        const landmarks = results.landmarks[0];
-        drawLandmarks(ctx, landmarks, canvas);
+    const mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: 640, height: 480 },
+    });
+    
+    activeStreamRef.current = mediaStream;
+    setCameraStream(mediaStream);
 
-        const raised = countRaisedFingers(landmarks);
-        if (raised !== lastGesture) {
-          lastGesture = raised;
+    if (videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
+      await videoRef.current.play();
+    }
 
-          if (raised === stageProgress) {
-            setCurrentPose(raised);
-            console.log(`✋ Detected ${raised} fingers`);
-            if (stageProgress > 1) {
-              stageProgress -= 1;
-              setStage(stageProgress);
-            } else if (stageProgress === 1) {
-              console.log("✅ Gesture sequence complete — start countdown");
-              setIsDetecting(false);
-              startCountdown();
-            }
+    detectHands();
+  } catch (err) {
+    console.error("❌ Error accessing camera:", err);
+  }
+};
+
+const detectHands = () => {
+  console.log("hands again");
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+  if (!video || !canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+
+  const renderFrame = async () => {
+    console.log("render again");
+    if (!handLandmarker || !video || video.readyState < 2) {
+      animationFrameIdRef.current = requestAnimationFrame(renderFrame);
+      return;
+    }
+
+    const startTimeMs = performance.now();
+    const results = await handLandmarker.detectForVideo(video, startTimeMs);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    if (!isCounting && results.landmarks?.length > 0 && isDetecting) {
+      const landmarks = results.landmarks[0];
+      drawLandmarks(ctx, landmarks, canvas);
+
+      const raised = countRaisedFingers(landmarks);
+      if (raised !== lastGestureRef.current) {
+        lastGestureRef.current = raised;
+
+        if (raised === stageProgressRef.current) {
+          setCurrentPose(raised);
+          console.log(`✋ Detected ${raised} fingers`);
+          
+          if (stageProgressRef.current > 1) {
+            stageProgressRef.current -= 1;
+            setStage(stageProgressRef.current);
+          } else if (stageProgressRef.current === 1) {
+            console.log("✅ Gesture sequence complete — start countdown");
+            setIsDetecting(false);
+            startCountdown();
           }
         }
       }
+    }
 
-      animationFrameId = requestAnimationFrame(renderFrame);
-    };
-
-    renderFrame();
+    animationFrameIdRef.current = requestAnimationFrame(renderFrame);
   };
 
-  const drawLandmarks = (ctx, landmarks, canvas) => {
-    console.log("landmark again");
-    ctx.fillStyle = "rgba(0, 169, 173, 0.4)";
-    landmarks.forEach((lm) => {
-      ctx.beginPath();
-      ctx.arc(lm.x * canvas.width, lm.y * canvas.height, 5, 0, 2 * Math.PI);
-      ctx.fill();
+  renderFrame();
+};
+
+const drawLandmarks = (ctx, landmarks, canvas) => {
+  console.log("landmark again");
+  ctx.fillStyle = "rgba(0, 169, 173, 0.4)";
+  landmarks.forEach((lm) => {
+    ctx.beginPath();
+    ctx.arc(lm.x * canvas.width, lm.y * canvas.height, 5, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+};
+
+const countRaisedFingers = (landmarks) => {
+  const fingers = [8, 12, 16, 20];
+  return fingers.filter((f) => landmarks[f].y < landmarks[f - 2].y).length;
+};
+
+const startCountdown = () => {
+  console.log("countdown again");
+  setIsCounting(true);
+  let counter = 3;
+  setCountdown(counter);
+
+  const interval = setInterval(() => {
+    counter -= 1;
+    if (counter > 0) {
+      setCountdown(counter);
+    } else {
+      clearInterval(interval);
+      setCountdown(null);
+      capturePhoto();
+      setIsCounting(false);
+    }
+  }, 1000);
+};
+
+const capturePhoto = () => {
+  const canvas = canvasRef.current;
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+
+    const url = URL.createObjectURL(blob);
+    setPhoto(url);
+
+    console.log("📸 Captured final photo Blob:", blob);
+    console.log("🌐 Object URL for preview:", url);
+    
+    // Stop camera after capturing photo
+    stopCamera();
+  }, "image/png");
+};
+
+const stopCamera = () => {
+  console.log("🛑 Stopping camera...");
+  
+  // Cancel animation frame
+  if (animationFrameIdRef.current) {
+    cancelAnimationFrame(animationFrameIdRef.current);
+    animationFrameIdRef.current = null;
+  }
+  
+  // Stop all tracks
+  if (activeStreamRef.current?.getTracks) {
+    activeStreamRef.current.getTracks().forEach((track) => {
+      track.stop();
+      console.log("Track stopped:", track.kind);
     });
-  };
+    activeStreamRef.current = null;
+  }
+  
+  // Clear video element
+  if (videoRef.current) {
+    videoRef.current.srcObject = null;
+  }
+  
+  setCameraStream(null);
+};
 
-  const countRaisedFingers = (landmarks) => {
-    const fingers = [8, 12, 16, 20];
-    return fingers.filter((f) => landmarks[f].y < landmarks[f - 2].y).length;
-  };
-
-  const startCountdown = () => {
-    console.log("countdown again");
-    setIsCounting(true);
-    let counter = 3;
-    setCountdown(counter);
-
-    const interval = setInterval(() => {
-      counter -= 1;
-      if (counter > 0) {
-        setCountdown(counter);
-      } else {
-        clearInterval(interval);
-        setCountdown(null);
-        capturePhoto();
-        setIsCounting(false);
-      }
-    }, 1000);
-  };
-
-  const capturePhoto = () => {
-    const canvas = canvasRef.current;
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-
-      const url = URL.createObjectURL(blob);
-      setPhoto(url);
-
-      console.log("📸 Captured final photo Blob:", blob);
-      console.log("🌐 Object URL for preview:", url);
-    }, "image/png");
-  };
-
-  const stopCamera = () => {
-    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    if (activeStream?.getTracks)
-      activeStream.getTracks().forEach((t) => t.stop());
-    if (videoRef.current) videoRef.current.srcObject = null;
-    activeStream = null;
-  };
-
-  const retake = () => {
-    lastGesture = null;
-    stageProgress = 3;
-    setStage(stageProgress);
-    setPhoto(null);
-    setCountdown(null);
-    setIsCounting(false);
-    setIsDetecting(true);
-    setCurrentPose(0);
-
-    startCamera();
+const retake = () => {
+  console.log("🔄 Retaking photo...");
+  
+  // Reset all states
+  lastGestureRef.current = null;
+  stageProgressRef.current = 3;
+  
+  setStage(3);
+  setPhoto(null);
+  setCountdown(null);
+  setIsCounting(false);
+  setIsDetecting(true);
+  setCurrentPose(0);
+  
+  // Stop current camera
+  stopCamera();
+  
+  // Wait a bit then restart
+  setTimeout(() => {
     setRetakePhoto(!retakePhoto);
-    setTimeout(() => {
-      startCamera();
-    }, 300);
-  };
+  }, 100);
+};
 
-  const handleSubmit = () => {
-    handleChange("profilePicture", photo);
-    lastGesture = null;
-    stageProgress = 3;
-    setStage(stageProgress);
-    setPhoto(null);
-    setCountdown(null);
-    setIsCounting(false);
-    setIsDetecting(true);
-    setCurrentPose(0);
-    closeModal();
-  };
-
+const handleSubmit = () => {
+  console.log("✅ Submitting photo...");
+  
+  // Pass photo to parent
+  handleChange("profilePicture", photo);
+  
+  // Stop camera FIRST
+  stopCamera();
+  
+  // Reset all states
+  lastGestureRef.current = null;
+  stageProgressRef.current = 3;
+  
+  setStage(3);
+  setPhoto(null);
+  setCountdown(null);
+  setIsCounting(false);
+  setIsDetecting(true);
+  setCurrentPose(0);
+  
+  // Close modal
+  closeModal();
+};
   if (!isOpen) return null;
 
   return (

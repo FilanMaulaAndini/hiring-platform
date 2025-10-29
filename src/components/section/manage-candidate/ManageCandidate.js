@@ -118,7 +118,7 @@ export default function ManageJob() {
                         {moment(candidate.birth_date).format("DD MMMM YYYY")}
                       </td>
                       <td>{candidate.domicile}</td>
-                      <td>{candidate.gender}</td>
+                      <td>{candidate.pronoun}</td>
                       <td>
                         <a
                           href={candidate.linkedin}

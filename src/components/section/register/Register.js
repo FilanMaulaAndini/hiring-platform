@@ -42,7 +42,6 @@ export default function RegisterPage() {
       // });
       const exists = await checkEmailExists(email);
       if (exists) {
-        console.log(exists);
         setEmailExist(
           "Email ini sudah terdaftar sebagai akun di Rakamin Academy."
         );
@@ -57,7 +56,6 @@ export default function RegisterPage() {
             emailRedirectTo: "http://localhost:3000/auth/callback",
           },
         });
-      console.log("Response:", { authData, authError });
 
       await supabase.from("users").insert([
         {

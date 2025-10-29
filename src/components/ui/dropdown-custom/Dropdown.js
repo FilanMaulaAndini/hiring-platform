@@ -40,7 +40,6 @@ export default function Dropdown({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  console.log(formData);
   return (
     <div
       ref={dropdownRef}

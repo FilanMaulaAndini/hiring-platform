@@ -35,17 +35,36 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: { session }, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
+
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (userError) {
+        console.error("User error:", userError);
+        setError(userError.message);
+        router.push("/");
+        return;
+      }
 
       if (error) {
         console.error(error);
         showToast(error.message, "error");
       } else {
-        router.push("/candidate");
-      }
+        if (userData.role === 1) {
+          router.push("/admin");
+        } else if (userData.role === 2) {
+          router.push("/candidate");
+        } else {
+          router.push("/");
+        }
+      }     
     } catch (err) {
       console.error(err);
     }
@@ -110,12 +129,12 @@ export default function LoginPage() {
                   {showPassword ? <FaEyeSlash /> : <IoEyeSharp />}
                 </div>
               </div>
-              <p className={`${styles.subtitle} ${styles.end}`}>
+              <div className={`${styles.subtitle} ${styles.end}`}>
                 <UnderlineButton
                   link={"#"}
                   text="Lupa kata sandi?"
                 ></UnderlineButton>
-              </p>
+              </div>
             </div>
           )}
 
